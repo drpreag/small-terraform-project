@@ -5,7 +5,7 @@ variable "nat_eni" {}
 variable "vpc_igw" {}
 variable "vpc_region" {}
 variable "subnet_types" {}
-variable "subnets_per_az" { default = 1 } # for core subnet subnet only, dmz and db are hardcoded to 1
+variable "core_subnets_per_az" { default = 1 } # for core subnet subnet only, dmz and db are hardcoded to 1
 variable "main_tags" {}
 variable "availability_zones" {}
 

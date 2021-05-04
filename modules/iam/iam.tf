@@ -31,7 +31,24 @@ resource "aws_iam_role" "service_role" {
         ]
     })
   }
-
+  inline_policy {
+    name = "get-own-tags"
+    policy = jsonencode({
+        "Version": "2012-10-17",
+        "Statement": [
+            {
+                "Condition": {
+                    "StringEquals": {
+                        "ec2:Region": "${var.aws_region}"
+                    }
+                },
+                "Action": "ec2:DescribeInstance*",
+                "Resource": "*",
+                "Effect": "Allow"
+            }
+        ]
+    })
+  }
   tags = {
     VpcName     = var.vpc_name
     Creator     = var.main_tags["Creator"]

@@ -38,7 +38,7 @@ module "vpc" {
   vpc_igw         = aws_internet_gateway.igw
   vpc_region      = var.aws_region
   subnet_types    = var.subnet_types
-  subnets_per_az  = var.subnets_per_az
+  core_subnets_per_az   = var.core_subnets_per_az
   availability_zones    = var.availability_zones
   main_tags       = var.main_tags
 }
@@ -122,9 +122,15 @@ resource "aws_vpc_endpoint_route_table_association" "core_s3" {
 }
 
 
+# Get latest AMI image
+module "ami" {
+  source        = "./modules/ami"
+}
+
 # NAT ec2 instance
 resource "aws_instance" "nat_instance" {
-  ami                   = var.nat_ami
+  #ami                   = var.nat_ami
+  ami                   = module.ami.latest_ami.id
   instance_type         = var.nat_instance_type
   availability_zone     = "${var.aws_region}a"
   key_name              = var.key_name
@@ -147,7 +153,8 @@ resource "aws_instance" "nat_instance" {
 
 # Proxy ec2 instance
 resource "aws_instance" "proxy_instance" {
-  ami                   = var.proxy_ami
+  #ami                   = var.proxy_ami
+  ami                   = module.ami.latest_ami.id
   instance_type         = var.proxy_instance_type
   availability_zone     = "${var.aws_region}a"
   key_name              = var.key_name
@@ -184,4 +191,23 @@ module "iam" {
   aws_region    = var.aws_region
   s3_bucket     = module.s3.s3_bucket_arn.arn
   main_tags     = var.main_tags
+}
+
+# Core instance
+resource "aws_instance" "core_instance" {
+  count                 = var.core_subnets_per_az * var.core_instances_per_subnet
+  ami                   = module.ami.latest_ami.id
+# ami                   = var.core_ami
+  instance_type         = var.core_instance_type
+  availability_zone     = "${var.aws_region}${var.availability_zones[count.index]}"
+  key_name              = var.key_name
+  iam_instance_profile  = module.iam.instance_profile
+  subnet_id             = module.vpc.core_subnets_list[count.index]
+  vpc_security_group_ids = [module.sg.core_sec_group.id]
+  tags = {
+    Name            = "${var.vpc_name}-core-${count.index+1}${var.availability_zones[count.index]}"
+    Role            = "${var.vpc_name}-core"
+    Vpc             = var.vpc_name
+    Creator         = var.main_tags["Creator"]
+  }
 }

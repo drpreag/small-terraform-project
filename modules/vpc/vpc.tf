@@ -4,6 +4,10 @@
 resource "aws_route_table" "dmz" {
   vpc_id                  = var.vpc_id
   route {
+    cidr_block            = "10.0.0.0/8"
+    network_interface_id  = var.nat_eni.id
+  }
+  route {
     cidr_block            = "0.0.0.0/0"
     gateway_id            = var.vpc_igw.id
   }
@@ -18,7 +22,7 @@ resource "aws_route_table" "core" {
   vpc_id                  = var.vpc_id
   route {
     cidr_block            = "0.0.0.0/0"
-    gateway_id            = var.vpc_igw.id
+    network_interface_id  = var.nat_eni.id
   }
   tags = {
     Name                  = "${var.vpc_name}-core"
@@ -56,7 +60,7 @@ resource "aws_subnet" "subnet_dmz" {    # create exactly one subnet for dmz
 # CORE subnets
 
 resource "aws_subnet" "subnet_core" {
-  count                   = var.subnets_per_az
+  count                   = var.core_subnets_per_az
   vpc_id                  = var.vpc_id
   cidr_block              = "10.${local.second_octet}.${count.index+8}.0/24"
   availability_zone       = "${var.vpc_region}${var.availability_zones[count.index]}"
@@ -88,21 +92,18 @@ resource "aws_subnet" "subnet_db" {     # create exactly 2 db subnet requeired b
 resource "aws_route_table_association" "dmz" {
   subnet_id         = aws_subnet.subnet_dmz.id
   route_table_id    = aws_route_table.dmz.id
-  depends_on        = [var.nat_eni]
 }
 
 resource "aws_route_table_association" "core" {
-  count             = var.subnets_per_az
+  count             = var.core_subnets_per_az
   subnet_id         = aws_subnet.subnet_core[count.index].id
   route_table_id    = aws_route_table.core.id
-  depends_on        = [var.nat_eni]
 }
 
 resource "aws_route_table_association" "db" {
   count             = 2
   subnet_id         = aws_subnet.subnet_db[count.index].id
   route_table_id    = aws_route_table.db.id
-  depends_on        = [var.nat_eni]
 }
 
 

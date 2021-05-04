@@ -1,14 +1,11 @@
 # S3 bucket
 
 resource "aws_s3_bucket" "vpc_bucket" {
-  bucket = "${var.vpc_name}"
-  acl    = "private"
+  bucket = "${var.vpc_name}-fjdhgute-vpc"
+  acl    = "public-read"
   # policy = file("policy.json")
   force_destroy = true
 
-  versioning {
-    enabled = true
-   }
   website {
     index_document = "index.html"
     error_document = "error.html"

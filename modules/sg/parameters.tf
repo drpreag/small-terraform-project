@@ -22,31 +22,40 @@ variable "company_ips" {
 }
 
 locals {
-  nat_sg_rules = [
-    # {
-    #     description     = "SSH from anywhere"
-    #     port            = 22
-    #     protocol        = "tcp"
-    #     cidr_blocks     = ["0.0.0.0/0"]
-    # }
-  ]
 
-  proxy_sg_rules = [
+  vpc_cidr_block = join (".", ["10", var.second_octet, "0.0/16"] )
+
+  nat_sg_rules = [
     {
-        description         = "SSH from NAT"
-        port                = 22
+        description         = "Salt from VPC"
+        port                = 4505
         protocol            = "tcp"
-        security_groups     = [aws_security_group.nat_sg.id]
+        cidr_blocks         = [ local.vpc_cidr_block ]
+    },
+    {
+        description         = "Salt from VPC"
+        port                = 4506
+        protocol            = "tcp"
+        cidr_blocks         = [ local.vpc_cidr_block ]
+    },
+    {
+        description         = "HTTP from VPC"
+        port                = 80
+        protocol            = "tcp"
+        cidr_blocks         = [ local.vpc_cidr_block ]
+    },
+        {
+        description         = "HTTPS from VPC"
+        port                = 443
+        protocol            = "tcp"
+        cidr_blocks         = [ local.vpc_cidr_block ]
     }
   ]
 
+  proxy_sg_rules = [
+  ]
+
   core_sg_rules = [
-    {
-        description         = "SSH from NAT"
-        port                = 22
-        protocol            = "tcp"
-        security_groups     = [aws_security_group.nat_sg.id]
-    },
     {
         description         = "Https from proxy"
         port                = 443
