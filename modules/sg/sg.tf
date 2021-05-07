@@ -37,13 +37,13 @@ resource "aws_security_group" "nat_sg" {
 }
 
 
-# Proxy sg
-resource "aws_security_group" "proxy_sg" {
-  name        = "${var.vpc_name}-proxy"
-  description = "Proxy / HTTPS security group"
+# LB sg
+resource "aws_security_group" "lb_sg" {
+  name        = "${var.vpc_name}-lb"
+  description = "LB / HTTPS security group"
   vpc_id      = var.vpc_id
   dynamic ingress {
-    for_each = local.proxy_sg_rules
+    for_each = local.lb_sg_rules
       content {
         description      = ingress.value.description
         from_port        = ingress.value.port
@@ -53,7 +53,7 @@ resource "aws_security_group" "proxy_sg" {
       }
   }
   ingress {
-    description         = "All from proxy"
+    description         = "All from lb"
     from_port           = 0
     to_port             = 0
     protocol            = "-1"
@@ -88,7 +88,7 @@ resource "aws_security_group" "proxy_sg" {
     cidr_blocks      = ["0.0.0.0/0"]
   }
   tags = {
-    Name        = "${var.vpc_name}-proxy"
+    Name        = "${var.vpc_name}-lb"
     Creator     = var.main_tags["Creator"]
   }
 }

@@ -55,6 +55,7 @@ module "sg" {
 
 
 # Primary ENI for nat instance
+# before creating instance we create ENI
 resource "aws_network_interface" "nat_eni" {
   subnet_id         = module.vpc.dmz_subnet[0].id       # place it in subnet_dmz_a, first zone
   security_groups   = [module.sg.nat_sec_group.id]
@@ -75,23 +76,24 @@ resource "aws_eip" "nat_primary" {
 }
 
 
-# Primary ENI for proxy instance
-resource "aws_network_interface" "proxy_eni" {
+# Primary ENI for lb instance
+# before creating instance we create ENI
+resource "aws_network_interface" "lb_eni" {
   subnet_id       = module.vpc.dmz_subnet[0].id      # place it in subnet_dmz_a, first zone
-  security_groups = [module.sg.proxy_sec_group.id]
+  security_groups = [module.sg.lb_sec_group.id]
   tags = {
-    Name          = "${var.vpc_name}-proxy-primary"
+    Name          = "${var.vpc_name}-lb-primary"
     Vpc           = var.vpc_name
     Creator       = var.main_tags["Creator"]
   }
   provisioner "local-exec" {
-    command = "echo \"PROXY ENI interface ${self.id}\""
+    command = "echo \"LB ENI interface ${self.id}\""
   }
 }
-resource "aws_eip" "proxy_primary" {
+resource "aws_eip" "lb_primary" {
   vpc                       = true
-  network_interface         = aws_network_interface.proxy_eni.id
-  associate_with_private_ip = aws_network_interface.proxy_eni.private_ip
+  network_interface         = aws_network_interface.lb_eni.id
+  associate_with_private_ip = aws_network_interface.lb_eni.private_ip
 }
 
 
@@ -122,19 +124,20 @@ resource "aws_vpc_endpoint_route_table_association" "core_s3" {
 }
 
 
-# Get latest AMI image
+# Get latest owned AMI image
 module "ami" {
   source        = "./modules/ami"
 }
 
 # NAT ec2 instance
 resource "aws_instance" "nat_instance" {
-  #ami                   = var.nat_ami
-  ami                   = module.ami.latest_ami.id
+  ami                   = var.nat_instance_ami
   instance_type         = var.nat_instance_type
   availability_zone     = "${var.aws_region}a"
   key_name              = var.key_name
   iam_instance_profile  = module.iam.instance_profile
+
+  # attach ENI created earlier
   network_interface {
     network_interface_id  = aws_network_interface.nat_eni.id
     device_index          = 0
@@ -151,27 +154,28 @@ resource "aws_instance" "nat_instance" {
   }
 }
 
-# Proxy ec2 instance
-resource "aws_instance" "proxy_instance" {
-  #ami                   = var.proxy_ami
+# LB ec2 instance
+resource "aws_instance" "lb_instance" {
   ami                   = module.ami.latest_ami.id
-  instance_type         = var.proxy_instance_type
+  instance_type         = var.lb_instance_type
   availability_zone     = "${var.aws_region}a"
   key_name              = var.key_name
   iam_instance_profile  = module.iam.instance_profile
+
+  # attach ENI created earlier
   network_interface {
-    network_interface_id  = aws_network_interface.proxy_eni.id
+    network_interface_id  = aws_network_interface.lb_eni.id
     device_index          = 0
   }
   tags = {
-    Name            = "${var.vpc_name}-proxy"
-    Role            = "${var.vpc_name}-proxy"
+    Name            = "${var.vpc_name}-lb"
+    Role            = "${var.vpc_name}-lb"
     Vpc             = var.vpc_name
     Creator         = var.main_tags["Creator"]
   }
-  depends_on        = [aws_network_interface.proxy_eni]
+  depends_on        = [aws_network_interface.lb_eni]
   provisioner "local-exec" {
-    command = "echo \"Proxy instance ${self.id}\""
+    command = "echo \"LB instance ${self.id}\""
   }
 }
 
@@ -197,7 +201,6 @@ module "iam" {
 resource "aws_instance" "core_instance" {
   count                 = var.core_subnets_per_az * var.core_instances_per_subnet
   ami                   = module.ami.latest_ami.id
-# ami                   = var.core_ami
   instance_type         = var.core_instance_type
   availability_zone     = "${var.aws_region}${var.availability_zones[count.index]}"
   key_name              = var.key_name

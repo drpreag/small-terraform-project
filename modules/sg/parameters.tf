@@ -5,7 +5,7 @@ variable "vpc_region" {}
 variable "second_octet" {}
 variable "main_tags" {}
 
-# Customers IPs to be whitelisted on proxy for port 443
+# Customers IPs to be whitelisted on lb for port 443
 variable "whitelist_ips" {
     type = map
     default = {
@@ -13,7 +13,7 @@ variable "whitelist_ips" {
     }
 }
 
-# Daon VPC ips to be whitelisted on proxy for port 443
+# Daon VPC ips to be whitelisted on lb for port 443
 variable "company_ips" {
     type = map
     default = {
@@ -52,15 +52,15 @@ locals {
     }
   ]
 
-  proxy_sg_rules = [
+  lb_sg_rules = [
   ]
 
   core_sg_rules = [
     {
-        description         = "Https from proxy"
+        description         = "Https from lb"
         port                = 443
         protocol            = "tcp"
-        security_groups     = [aws_security_group.proxy_sg.id]
+        security_groups     = [aws_security_group.lb_sg.id]
     }
   ]
 

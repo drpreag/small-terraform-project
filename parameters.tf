@@ -1,10 +1,15 @@
-# Creates basic VPC with subnets, route tables, NACLs and security groups
+# Make changes only to this file, do not hardcode changes to main.tf
+#
 # Creates:
-#         Bastion host
-#         HAProxy instance
-#         Core instance
-#         S3 bucket with web hosting
-#         IAM role
+#         VPC with subnets, route tables, NACLs and security groups
+#         Bastion host  (one instance in first dmz subnet)
+#         Load balancer instance  (one instance in first dmz subnet)
+#         Core instance(s) for taking a load (multiple instances)
+#         S3 bucket
+#         Instance IAM role
+#         KMS key
+#         R53 records
+#         RDS
 
 provider "aws" {
   region = var.aws_region
@@ -16,7 +21,7 @@ variable "vpc_name"             { default = "dev" }
 
 variable "aws_region"           { default = "eu-west-1" }
 variable "vpc_cidr"           {
-  description = "VPC main CIDR range in form: 10.XXX.0.0/16"
+  description = "VPC CIDR range in form: 10.XXX.0.0/16"
   default = "10.12.0.0/16"
 }
 
@@ -29,21 +34,24 @@ variable "core_subnets_per_az"        { default = 1 }
 variable "core_instances_per_subnet"  { default = 1 }
 variable "availability_zones"   {
   type = list
-  default = [ "a", "b", "c", "d" ]
+  default = [ "a", "b", "c" ]
 }
 
 variable "key_name"             { default = "drpreag" }
 
-# AMI s
+# AMI's
+variable "nat_instance_ami"     { default = "ami-002ebef5ab835ada1" }
+
+# Instance types
 variable "nat_instance_type"    { default = "t3a.micro" }
-variable "proxy_instance_type"  { default = "t3a.micro" }
+variable "lb_instance_type"     { default = "t3a.micro" }
 variable "core_instance_type"   { default = "t3a.micro" }
 
 # Tags
 variable "main_tags" {
   default = {
     Creator     = "Terraform"
-    Project     = "basic_vpc"
+    Project     = "test_vpc"
   }
 }
 

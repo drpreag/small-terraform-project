@@ -11,6 +11,6 @@ output "db_sec_group" {
   value = aws_security_group.db_sg
 }
 
-output "proxy_sec_group" {
-  value = aws_security_group.proxy_sg
+output "lb_sec_group" {
+  value = aws_security_group.lb_sg
 }
