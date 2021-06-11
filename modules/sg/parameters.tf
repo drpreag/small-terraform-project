@@ -13,7 +13,7 @@ variable "whitelist_ips" {
     }
 }
 
-# Daon VPC ips to be whitelisted on lb for port 443
+# IPs to be whitelisted on lb for port 443
 variable "company_ips" {
     type = map
     default = {
