@@ -178,9 +178,3 @@ resource "aws_security_group" "db_sg" {
     Creator     = var.main_tags["Creator"]
   }
 }
-
-
-# Clear all rules in default sg - this will actually delete default sg
-resource "aws_default_security_group" "default" {
-  vpc_id = var.vpc_id
-}
