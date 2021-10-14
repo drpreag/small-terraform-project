@@ -13,7 +13,7 @@
 
 provider "aws" {
   region = var.aws_region
-  profile = "drpreag"
+  profile = "default"
 }
 
 # Basic stuff
@@ -40,7 +40,7 @@ variable "availability_zones"   {
 variable "key_name"             { default = "drpreag" }
 
 # AMI's
-variable "nat_instance_ami"     { default = "ami-002ebef5ab835ada1" }
+variable "nat_instance_ami"     { default = "ami-002ebef5ab835ada1" } # custom ami
 
 # Instance types
 variable "nat_instance_type"    { default = "t3a.micro" }
