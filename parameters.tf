@@ -12,11 +12,7 @@
 #         RDS
 
 provider "aws" {
-<<<<<<< HEAD
   region = var.aws_region
-=======
-  region  = var.aws_region
->>>>>>> 91805dd (Improvements)
   profile = "default"
 }
 
@@ -44,11 +40,7 @@ variable "availability_zones" {
 variable "key_name" { default = "drpreag" }
 
 # AMI's
-<<<<<<< HEAD
 variable "nat_instance_ami"     { default = "ami-002ebef5ab835ada1" } # custom ami
-=======
-variable "nat_instance_ami" { default = "ami-002ebef5ab835ada1" }
->>>>>>> 91805dd (Improvements)
 
 # Instance types
 variable "nat_instance_type" { default = "t3a.micro" }
