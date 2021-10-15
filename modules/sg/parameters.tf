@@ -5,19 +5,11 @@ variable "vpc_region" {}
 variable "second_octet" {}
 variable "main_tags" {}
 
-# Customers IPs to be whitelisted on lb for port 443
-variable "whitelist_ips" {
-    type = map
-    default = {
-        # "drpreag"      = "62.240.26.13/32"
-    }
-}
-
 # IPs to be whitelisted on lb for port 443
 variable "company_ips" {
     type = map
     default = {
-        "drpreag"      = "62.240.26.13/32"
+        "drpreag"      = "46.235.100.0/24"
     }
 }
 
@@ -27,24 +19,12 @@ locals {
 
   nat_sg_rules = [
     {
-        description         = "Salt from VPC"
-        port                = 4505
-        protocol            = "tcp"
-        cidr_blocks         = [ local.vpc_cidr_block ]
-    },
-    {
-        description         = "Salt from VPC"
-        port                = 4506
-        protocol            = "tcp"
-        cidr_blocks         = [ local.vpc_cidr_block ]
-    },
-    {
         description         = "HTTP from VPC"
         port                = 80
         protocol            = "tcp"
         cidr_blocks         = [ local.vpc_cidr_block ]
     },
-        {
+    {
         description         = "HTTPS from VPC"
         port                = 443
         protocol            = "tcp"

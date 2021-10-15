@@ -12,7 +12,7 @@
 #         RDS
 
 provider "aws" {
-  region = var.aws_region
+  region  = var.aws_region
   profile = "default"
 }
 
@@ -22,7 +22,7 @@ variable "vpc_name" { default = "prod" }
 variable "aws_region" { default = "eu-west-1" }
 variable "vpc_cidr" {
   description = "VPC CIDR range in form: 10.XXX.0.0/16"
-  default     = "10.10.0.0/16"
+  default     = "10.24.0.0/16"
 }
 
 variable "subnet_types" {
@@ -37,10 +37,7 @@ variable "availability_zones" {
   default = ["a", "b", "c"]
 }
 
-variable "key_name" { default = "drpreag" }
-
-# AMI's
-variable "nat_instance_ami"     { default = "ami-002ebef5ab835ada1" } # custom ami
+variable "key_name" { default = "drpreag-2021" }
 
 # Instance types
 variable "nat_instance_type" { default = "t3a.micro" }

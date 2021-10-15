@@ -4,9 +4,8 @@ data "aws_ami" "base_os" {
   owners           = ["self"]
 
   filter {
-    #name   = "tag:ami_name"
     name   = "tag:Name"
-    values = ["base_os*"]
+    values = ["${local.image_name_filter}*"]
   }
 
 }

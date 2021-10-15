@@ -124,14 +124,14 @@ resource "aws_vpc_endpoint_route_table_association" "core_s3" {
 }
 
 
-# Get latest owned AMI image
+# # Get latest owned AMI image
 module "ami" {
   source = "./modules/ami"
 }
 
 # NAT ec2 instance
 resource "aws_instance" "nat_instance" {
-  ami                  = var.nat_instance_ami
+  ami                  = module.ami.instance_ami.id
   instance_type        = var.nat_instance_type
   availability_zone    = "${var.aws_region}a"
   key_name             = var.key_name
@@ -156,7 +156,7 @@ resource "aws_instance" "nat_instance" {
 
 # LB ec2 instance
 resource "aws_instance" "lb_instance" {
-  ami                  = module.ami.latest_ami.id
+  ami                  = module.ami.instance_ami.id
   instance_type        = var.lb_instance_type
   availability_zone    = "${var.aws_region}a"
   key_name             = var.key_name
@@ -200,7 +200,7 @@ module "iam" {
 # Core instance
 resource "aws_instance" "core_instance" {
   count                  = var.core_subnets_per_az * var.core_instances_per_subnet
-  ami                    = module.ami.latest_ami.id
+  ami                    = module.ami.instance_ami.id
   instance_type          = var.core_instance_type
   availability_zone      = "${var.aws_region}${var.availability_zones[count.index]}"
   key_name               = var.key_name
