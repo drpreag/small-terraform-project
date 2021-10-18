@@ -1,3 +1,11 @@
+output "vpc" {
+  value = aws_vpc.vpc
+}
+
+output "igw"{
+  value = aws_internet_gateway.igw
+}
+
 output "route_table_dmz" {
   value = aws_route_table.dmz
 }
@@ -12,11 +20,11 @@ output "route_table_db" {
 output "route_tables_list" {
   value = tolist ( [ aws_route_table.dmz, aws_route_table.core, aws_route_table.db ] )
 }
+
 output "core_subnets_list" {
   value = tolist ( [for s in aws_subnet.subnet_core : s.id] )
 }
 output "db_subnet_list" {
-  #value = tolist ( [ aws_subnet.subnet_db ] )
   value = tolist ( [for s in aws_subnet.subnet_db : s.id] )
 }
 output "dmz_subnet" {

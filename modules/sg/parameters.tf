@@ -1,9 +1,10 @@
-
 variable "vpc_id" {}
+
 variable "vpc_name" {}
-variable "vpc_region" {}
+
+#variable "vpc_region" {}
+
 variable "second_octet" {}
-variable "main_tags" {}
 
 # IPs to be whitelisted on lb for port 443
 variable "company_ips" {

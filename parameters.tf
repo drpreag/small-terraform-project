@@ -1,56 +1,59 @@
-# Make changes only to this file, do not hardcode changes to main.tf
+# Make only to this file only, do not hardcode any parameter to main.tf
 #
-# Creates:
-#         VPC with subnets, route tables, NACLs and security groups
-#         Bastion host  (one instance in first dmz subnet)
-#         Load balancer instance  (one instance in first dmz subnet)
-#         Core instance(s) for taking a load (multiple instances)
-#         S3 bucket
-#         Instance IAM role
+# This terraform repository creates:
+#
+#         VPC with IGW, subnets, route tables, NACLs and security groups
+#         Instance IAM role / profile
 #         KMS key
 #         R53 records
-#         RDS
+#
+#         TBD:
+#         Core instance(s) for taking a load
+#         Bastion host (one instance in dmz subnet)
+#         ALB
+#
+# Author Predrag Vlajkovic 2021
+#
 
 provider "aws" {
   region  = var.aws_region
   profile = "default"
+  default_tags {
+    tags = {
+      Environment = "Dev"
+      Owner       = "DrPreAG"
+      Creator     = "infrastructure/terraform"
+      Project     = "small-terraform-project"
+      Vpc         = "${var.vpc_name}"
+    }
+  }
 }
 
-# Basic stuff
-variable "vpc_name" { default = "prod" }
+# Variables
+
+variable "vpc_name" { default = "stfp" }
 
 variable "aws_region" { default = "eu-west-1" }
+
 variable "vpc_cidr" {
   description = "VPC CIDR range in form: 10.XXX.0.0/16"
   default     = "10.24.0.0/16"
 }
 
-variable "subnet_types" {
-  type    = list(any)
-  default = ["dmz", "core", "db"]
-}
+variable "subnets_per_az" { default = 2 }
 
-variable "core_subnets_per_az" { default = 1 }
-variable "core_instances_per_subnet" { default = 1 }
 variable "availability_zones" {
   type    = list(any)
   default = ["a", "b", "c"]
 }
 
-variable "key_name" { default = "drpreag-2021" }
+variable "key_name" { default = "drpreag_2021" }
 
 # Instance types
 variable "nat_instance_type" { default = "t3a.micro" }
 variable "lb_instance_type" { default = "t3a.micro" }
 variable "core_instance_type" { default = "t3a.micro" }
 
-# Tags
-variable "main_tags" {
-  default = {
-    Creator = "Terraform"
-    Project = "test_vpc"
-  }
-}
 
 locals {
   second_octet = split(".", var.vpc_cidr)[1]

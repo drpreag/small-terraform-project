@@ -17,20 +17,20 @@ resource "aws_iam_role" "service_role" {
       },
     ]
   })
-  inline_policy {
-    name = "s3_access"
-    policy = jsonencode({
-        "Version": "2012-10-17",
-        "Statement": [
-            {
-                "Action": [
-                    "s3:*"                ],
-                "Resource": "${var.s3_bucket}/*",
-                "Effect": "Allow"
-            }
-        ]
-    })
-  }
+  # inline_policy {
+  #   name = "s3_access"
+  #   policy = jsonencode({
+  #       "Version": "2012-10-17",
+  #       "Statement": [
+  #           {
+  #               "Action": [
+  #                   "s3:*"                ],
+  #               "Resource": "${var.s3_bucket}/*",
+  #               "Effect": "Allow"
+  #           }
+  #       ]
+  #   })
+  # }
   inline_policy {
     name = "get-own-tags"
     policy = jsonencode({
@@ -51,7 +51,6 @@ resource "aws_iam_role" "service_role" {
   }
   tags = {
     VpcName     = var.vpc_name
-    Creator     = var.main_tags["Creator"]
   }
 }
 

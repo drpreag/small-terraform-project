@@ -89,7 +89,6 @@ resource "aws_security_group" "lb_sg" {
   }
   tags = {
     Name        = "${var.vpc_name}-lb"
-    Creator     = var.main_tags["Creator"]
   }
 }
 
@@ -131,7 +130,6 @@ resource "aws_security_group" "core_sg" {
   }
   tags = {
     Name        = "${var.vpc_name}-core"
-    Creator     = var.main_tags["Creator"]
   }
 }
 
@@ -175,6 +173,5 @@ resource "aws_security_group" "db_sg" {
 
   tags = {
     Name        = "${var.vpc_name}-db"
-    Creator     = var.main_tags["Creator"]
   }
 }
