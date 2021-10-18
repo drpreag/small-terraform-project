@@ -1,35 +1,31 @@
 # # Get latest owned AMI image
 module "ami" {
-  source = "./modules/ami"
+  source = "../ami"
 }
 
 
-# NAT ec2 instance
-resource "aws_instance" "nat_instance" {
-  ami                  = module.ami.instance_ami.id
-  instance_type        = var.nat_instance_type
-  availability_zone    = "${var.aws_region}a"
-  key_name             = var.key_name
-  iam_instance_profile = module.iam.instance_profile
+# BASTION ec2 instance
+resource "aws_instance" "bastion" {
+  ami                         = module.ami.instance_ami.id
+  instance_type               = var.bastion_instance_type
+  subnet_id                   = var.bastion_subnet_id
+  key_name                    = var.key_name
+  iam_instance_profile        = var.instance_profile
+  associate_public_ip_address = true
+  source_dest_check           = false
+  security_groups             = [ var.bastion_sec_group.id ]
 
-  # attach ENI created earlier
-  network_interface {
-    network_interface_id = aws_network_interface.nat_eni.id
-    device_index         = 0
-  }
   tags = {
-    Name    = "${var.vpc_name}-nat"
-    Role    = "${var.vpc_name}-nat"
-    Vpc     = var.vpc_name
-    Creator = var.main_tags["Creator"]
+    Name    = "${var.vpc.tags["Name"]}-bastion"
   }
-  depends_on = [aws_network_interface.nat_eni]
   provisioner "local-exec" {
-    command = "echo \"NAT instance ${self.id}\""
+    command = "echo \"Bastion instance ${self.id}\""
   }
 }
 
-# LB ec2 instance
+
+/*
+# LB ec2 instance - haproxy
 resource "aws_instance" "lb_instance" {
   ami                  = module.ami.instance_ami.id
   instance_type        = var.lb_instance_type
@@ -116,3 +112,4 @@ resource "aws_eip" "lb_primary" {
   network_interface         = aws_network_interface.lb_eni.id
   associate_with_private_ip = aws_network_interface.lb_eni.private_ip
 }
+*/

@@ -1,7 +1,4 @@
-variable "vpc_name" {}
+variable "vpc" {}
+
 variable "aws_region" {}
-
-# variable "s3_bucket" {}
-
-#variable "main_tags" {}
 

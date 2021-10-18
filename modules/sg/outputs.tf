@@ -1,6 +1,6 @@
 
-output "nat_sec_group" {
-  value = aws_security_group.nat_sg
+output "bastion_sec_group" {
+  value = aws_security_group.bastion_sg
 }
 
 output "core_sec_group" {

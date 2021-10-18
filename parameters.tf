@@ -50,7 +50,7 @@ variable "availability_zones" {
 variable "key_name" { default = "drpreag_2021" }
 
 # Instance types
-variable "nat_instance_type" { default = "t3a.micro" }
+variable "bastion_instance_type" { default = "t3a.micro" }
 variable "lb_instance_type" { default = "t3a.micro" }
 variable "core_instance_type" { default = "t3a.micro" }
 

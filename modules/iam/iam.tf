@@ -2,7 +2,7 @@
 # IAM role
 
 resource "aws_iam_role" "service_role" {
-  name = var.vpc_name
+  name = var.vpc.tags["Name"]
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
@@ -50,7 +50,7 @@ resource "aws_iam_role" "service_role" {
     })
   }
   tags = {
-    VpcName     = var.vpc_name
+    Name      = "${var.vpc.tags["Name"]}-service_role"
   }
 }
 
@@ -58,6 +58,6 @@ resource "aws_iam_role" "service_role" {
 # IAM instance profile
 
 resource "aws_iam_instance_profile" "instance_profile" {
-  name  = var.vpc_name
+  name  = var.vpc.tags["Name"]
   role = aws_iam_role.service_role.name
 }

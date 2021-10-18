@@ -1,12 +1,12 @@
+# Bastion sg
 
-# NAT sg
-resource "aws_security_group" "nat_sg" {
-  name        = "${var.vpc_name}-nat"
-  description = "NAT security group"
-  vpc_id      = var.vpc_id
+resource "aws_security_group" "bastion_sg" {
+  name        = "${local.vpc_name}-bastion"
+  description = "Bastion security group"
+  vpc_id      = var.vpc.id
 
   dynamic ingress {
-    for_each = local.nat_sg_rules
+    for_each = local.bastion_sg_rules
       content {
         description      = ingress.value.description
         from_port        = ingress.value.port
@@ -32,16 +32,17 @@ resource "aws_security_group" "nat_sg" {
     cidr_blocks      = ["0.0.0.0/0"]
   }
   tags = {
-    Name       = "${var.vpc_name}-nat"
+    Name       = "${local.vpc_name}-bastion"
   }
 }
 
 
 # LB sg
+
 resource "aws_security_group" "lb_sg" {
-  name        = "${var.vpc_name}-lb"
+  name        = "${local.vpc_name}-lb"
   description = "LB / HTTPS security group"
-  vpc_id      = var.vpc_id
+  vpc_id      = var.vpc.id
   dynamic ingress {
     for_each = local.lb_sg_rules
       content {
@@ -60,11 +61,11 @@ resource "aws_security_group" "lb_sg" {
     self                = true
   }
   ingress {
-    description         = "All from nat"
+    description         = "All from bastion"
     from_port           = 0
     to_port             = 0
     protocol            = "-1"
-    security_groups     = [ aws_security_group.nat_sg.id ]
+    security_groups     = [ aws_security_group.bastion_sg.id ]
   }
 
   ingress {
@@ -88,15 +89,16 @@ resource "aws_security_group" "lb_sg" {
     cidr_blocks      = ["0.0.0.0/0"]
   }
   tags = {
-    Name        = "${var.vpc_name}-lb"
+    Name        = "${local.vpc_name}-lb"
   }
 }
 
 # Core sg
+
 resource "aws_security_group" "core_sg" {
-  name        = "${var.vpc_name}-core"
+  name        = "${local.vpc_name}-core"
   description = "Core security group"
-  vpc_id      = var.vpc_id
+  vpc_id      = var.vpc.id
   dynamic ingress {
     for_each = local.core_sg_rules
       content {
@@ -115,11 +117,11 @@ resource "aws_security_group" "core_sg" {
     self                = true
   }
   ingress {
-    description         = "All from nat"
+    description         = "All from bastion"
     from_port           = 0
     to_port             = 0
     protocol            = "-1"
-    security_groups     = [ aws_security_group.nat_sg.id ]
+    security_groups     = [ aws_security_group.bastion_sg.id ]
   }
 
   egress {
@@ -129,16 +131,17 @@ resource "aws_security_group" "core_sg" {
     cidr_blocks      = ["0.0.0.0/0"]
   }
   tags = {
-    Name        = "${var.vpc_name}-core"
+    Name        = "${local.vpc_name}-core"
   }
 }
 
 
 # DB sg
+
 resource "aws_security_group" "db_sg" {
-  name        = "${var.vpc_name}-db"
+  name        = "${local.vpc_name}-db"
   description = "DB security group"
-  vpc_id      = var.vpc_id
+  vpc_id      = var.vpc.id
 
   dynamic ingress {
     for_each = local.db_sg_rules
@@ -158,20 +161,20 @@ resource "aws_security_group" "db_sg" {
     self                = true
   }
   ingress {
-    description         = "All from nat"
+    description         = "All from core"
     from_port           = 0
     to_port             = 0
     protocol            = "-1"
-    security_groups     = [ aws_security_group.nat_sg.id ]
+    security_groups     = [ aws_security_group.core_sg.id ]
   }
   egress {
     from_port        = 0
     to_port          = 0
     protocol         = "-1"
-    cidr_blocks      = [ local.vpc_cidr_block ]
+    cidr_blocks      = [ var.vpc.cidr_block ]
   }
 
   tags = {
-    Name        = "${var.vpc_name}-db"
+    Name        = "${local.vpc_name}-db"
   }
 }

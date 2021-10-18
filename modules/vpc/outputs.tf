@@ -28,5 +28,5 @@ output "db_subnet_list" {
   value = tolist ( [for s in aws_subnet.subnet_db : s.id] )
 }
 output "dmz_subnet" {
-  value = tolist ( [ aws_subnet.subnet_dmz ] )
+  value = tolist ( [for s in aws_subnet.subnet_dmz : s.id] )
 }

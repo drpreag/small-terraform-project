@@ -1,12 +1,9 @@
-variable "vpc_id" {}
-
-variable "vpc_name" {}
-
-#variable "vpc_region" {}
-
-variable "second_octet" {}
+variable "vpc" {}
 
 # IPs to be whitelisted on lb for port 443
+# TBD move all SG rules to main/parameters.tf, so all changable things be on one place
+# not inside a module
+
 variable "company_ips" {
     type = map
     default = {
@@ -16,20 +13,14 @@ variable "company_ips" {
 
 locals {
 
-  vpc_cidr_block = join (".", ["10", var.second_octet, "0.0/16"] )
+  vpc_name  = var.vpc.tags["Name"]
 
-  nat_sg_rules = [
+  bastion_sg_rules = [
     {
-        description         = "HTTP from VPC"
-        port                = 80
+        description         = "SSH"
+        port                = 22
         protocol            = "tcp"
-        cidr_blocks         = [ local.vpc_cidr_block ]
-    },
-    {
-        description         = "HTTPS from VPC"
-        port                = 443
-        protocol            = "tcp"
-        cidr_blocks         = [ local.vpc_cidr_block ]
+        cidr_blocks         = [ var.vpc.cidr_block ]
     }
   ]
 
