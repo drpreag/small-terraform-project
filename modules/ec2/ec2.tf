@@ -1,12 +1,7 @@
-# # Get latest owned AMI image
-module "ami" {
-  source = "../ami"
-}
 
-
-# BASTION ec2 instance
+# BASTION ec2 instance in dmz subnet
 resource "aws_instance" "bastion" {
-  ami                         = module.ami.instance_ami.id
+  ami                         = data.aws_ami.base_os_image.id
   instance_type               = var.bastion_instance_type
   subnet_id                   = var.bastion_subnet_id
   key_name                    = var.key_name
@@ -14,102 +9,56 @@ resource "aws_instance" "bastion" {
   associate_public_ip_address = true
   source_dest_check           = false
   security_groups             = [ var.bastion_sec_group.id ]
-
+  disable_api_termination     = false  # set to true when done done
+  ebs_optimized               = false
+  root_block_device {
+    volume_size               = 8
+    volume_type               = "gp2"
+    delete_on_termination     = true
+  }
+  credit_specification {
+    cpu_credits               = "standard"
+  }
+  user_data = <<-EOF
+    #!/bin/bash
+    hostnamectl set-hostname "${var.vpc.tags["Name"]}-bastion"
+    yum check-update
+    echo "net.ipv4.ip_forward=1" >> /etc/sysctl.conf
+    EOF
   tags = {
-    Name    = "${var.vpc.tags["Name"]}-bastion"
+    Name                      = "${var.vpc.tags["Name"]}-bastion"
   }
   provisioner "local-exec" {
-    command = "echo \"Bastion instance ${self.id}\""
+    command                   = "echo \"Bastion instance ${self.id}\""
   }
 }
 
-
-/*
-# LB ec2 instance - haproxy
-resource "aws_instance" "lb_instance" {
-  ami                  = module.ami.instance_ami.id
-  instance_type        = var.lb_instance_type
-  availability_zone    = "${var.aws_region}a"
-  key_name             = var.key_name
-  iam_instance_profile = module.iam.instance_profile
-
-  # attach ENI created earlier
-  network_interface {
-    network_interface_id = aws_network_interface.lb_eni.id
-    device_index         = 0
-  }
+resource "aws_eip" "bastion_eip" {
+  vpc                         = true
+  instance                    = aws_instance.bastion.id
   tags = {
-    Name    = "${var.vpc_name}-lb"
-    Role    = "${var.vpc_name}-lb"
-    Vpc     = var.vpc_name
-    Creator = var.main_tags["Creator"]
-  }
-  depends_on = [aws_network_interface.lb_eni]
-  provisioner "local-exec" {
-    command = "echo \"LB instance ${self.id}\""
+    Name                      = "${var.vpc.tags["Name"]}-bastion-eip"
   }
 }
 
 
-# Core instance
-resource "aws_instance" "core_instance" {
-  count                  = var.core_subnets_per_az * var.core_instances_per_subnet
-  ami                    = module.ami.instance_ami.id
-  instance_type          = var.core_instance_type
-  availability_zone      = "${var.aws_region}${var.availability_zones[count.index]}"
-  key_name               = var.key_name
-  iam_instance_profile   = module.iam.instance_profile
-  subnet_id              = module.vpc.core_subnets_list[count.index]
-  vpc_security_group_ids = [module.sg.core_sec_group.id]
-  tags = {
-    Name    = "${var.vpc_name}-core-${count.index + 1}${var.availability_zones[count.index]}"
-    Role    = "${var.vpc_name}-core"
-    Vpc     = var.vpc_name
-    Creator = var.main_tags["Creator"]
-  }
-}
+# R53 records
 
-# Primary ENI for nat instance
-# before creating instance we create ENI and
-# use it in route tables
-resource "aws_network_interface" "nat_eni" {
-  subnet_id         = aws_subnet.subnet_dmz[0].id # place it in subnet_dmz_a, first zone
-  security_groups   = [module.sg.nat_sec_group.id]
-  source_dest_check = false
-  tags = {
-    Name    = "${var.vpc_name}-nat-primary"
-    Vpc     = var.vpc_name
-    Creator = var.main_tags["Creator"]
-  }
-  provisioner "local-exec" {
-    command = "echo \"NAT ENI interface ${self.id}\""
-  }
-}
-resource "aws_eip" "nat_primary" {
-  vpc                       = true
-  network_interface         = aws_network_interface.nat_eni.id
-  associate_with_private_ip = aws_network_interface.nat_eni.private_ip
+resource "aws_route53_record" "bastion_local" {
+  zone_id                     = var.route53_zone_local.id
+  name                        = "bastion.local"
+  type                        = "A"
+  ttl                         = "300"
+  records = [ aws_instance.bastion.private_ip ]
 }
 
 
-
-# Primary ENI for lb instance
-# before creating instance we create ENI
-resource "aws_network_interface" "lb_eni" {
-  subnet_id       = module.vpc.dmz_subnet[0].id # place it in subnet_dmz_a, first zone
-  security_groups = [module.sg.lb_sec_group.id]
-  tags = {
-    Name    = "${var.vpc_name}-lb-primary"
-    Vpc     = var.vpc_name
-    Creator = var.main_tags["Creator"]
-  }
-  provisioner "local-exec" {
-    command = "echo \"LB ENI interface ${self.id}\""
+# get base ami image
+data "aws_ami" "base_os_image" {
+  most_recent                 = true
+  owners                      = ["self"]
+  filter {
+    name                      = "tag:Name"
+    values                    = ["${local.image_name_filter}*"]
   }
 }
-resource "aws_eip" "lb_primary" {
-  vpc                       = true
-  network_interface         = aws_network_interface.lb_eni.id
-  associate_with_private_ip = aws_network_interface.lb_eni.private_ip
-}
-*/

@@ -1,12 +1,10 @@
-
-# Zones
+# Local private zone
 
 resource "aws_route53_zone" "local" {
   name    = "local"
-  comment = "PRIVATE zone for ${var.vpc_name}"
-
+  comment = "PRIVATE zone for ${var.vpc.tags["Name"]}"
   vpc {
-    vpc_id = var.vpc_id
+    vpc_id = var.vpc.id
   }
 }
 
