@@ -16,6 +16,7 @@ resource "aws_db_instance" "mysql_rds" {
   storage_encrypted       = true
   kms_key_id              = data.aws_kms_key.alias.arn
   multi_az                = false
+  skip_final_snapshot     = true
 }
 
 resource "aws_db_subnet_group" "dbsubnetg" {

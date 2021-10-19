@@ -7,5 +7,5 @@ output "bastion_ec2_instance" {
 }
 
 output "rds_instance" {
-  value = module.rds.mysql.id
+  value = module.rds.rds_instance.id
 }
