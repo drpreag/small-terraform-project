@@ -44,7 +44,6 @@ data "aws_route53_zone" "private" {
 }
 
 resource "aws_route53_record" "bastion_local" {
-  #zone_id                     = var.route53_private_zone.id
   zone_id                     = data.aws_route53_zone.private.id
   name                        = "${local.vpc_name}-bastion.local"
   type                        = "A"

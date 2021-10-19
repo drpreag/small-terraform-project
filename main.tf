@@ -46,5 +46,4 @@ module "ec2" {
   min_size              = var.min_size
   key_name              = var.key_name
   instance_profile      = module.iam.instance_profile
-  #route53_private_zone  = module.route53.route53_private_zone
 }

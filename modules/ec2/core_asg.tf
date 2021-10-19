@@ -35,7 +35,6 @@ resource "aws_autoscaling_group" "core" {
   }
   tag {
       key                     = "asg:hostname_pattern"
-      #value                   = "${local.vpc_name}-core-#instanceid.local@${var.route53_private_zone.id}"
       value                   = "${local.vpc_name}-core-#instanceid.local@${data.aws_route53_zone.private.id}"
       propagate_at_launch     = true
   }
@@ -72,7 +71,6 @@ data "template_file" "core" {
 module "autoscale_dns" {
   source                      = "meltwater/asg-dns-handler/aws"
   version                     = "2.1.3"
-  #autoscale_route53zone_arn   = var.route53_private_zone.id
   autoscale_route53zone_arn   = data.aws_route53_zone.private.id
   vpc_name                    = local.vpc_name
   autoscale_handler_unique_identifier = "core"
