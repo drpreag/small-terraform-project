@@ -1,6 +1,6 @@
 
 resource "aws_kms_key" "main_key" {
-  description             = "${var.vpc_name}"
+  description             = "${local.vpc_name}"
   deletion_window_in_days = 7
   policy                  = jsonencode({
             "Version": "2012-10-17",
@@ -18,7 +18,7 @@ resource "aws_kms_key" "main_key" {
 }
 
 resource "aws_kms_alias" "alias" {
-  name          = "alias/${var.vpc_name}"
+  name          = "alias/${local.vpc_name}"
   target_key_id = aws_kms_key.main_key.id
 }
 

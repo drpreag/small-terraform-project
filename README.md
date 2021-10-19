@@ -14,6 +14,6 @@ This terraform repository creates:
     - Bastion EC2 instance with EIP
     - Core instances within ASG in private subnet
     - R53 .local zone, with bastion instance record, and dynamic records for core ASG
-    - 
+    - KMS key
 
 Note: all parameter changes should go to file: /parameters.tf .

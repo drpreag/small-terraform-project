@@ -46,4 +46,13 @@ module "ec2" {
   min_size              = var.min_size
   key_name              = var.key_name
   instance_profile      = module.iam.instance_profile
+
+  depends_on = [module.route53]
+}
+
+
+# KMS
+module "kms" {
+  source = "./modules/kms"
+  vpc    = module.vpc.vpc
 }
