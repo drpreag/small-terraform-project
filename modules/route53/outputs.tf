@@ -1,5 +1,5 @@
 
-output "route53_zone_local" {
-  value = aws_route53_zone.local
+output "route53_private_zone" {
+  value = aws_route53_zone.private
 }
 

@@ -31,7 +31,7 @@ resource "aws_subnet" "subnet_dmz" {
   count                   = var.subnets_per_az
   vpc_id                  = aws_vpc.vpc.id
   cidr_block              = "10.${local.second_octet}.${count.index}.0/24"
-  availability_zone       = "${var.vpc_region}${var.availability_zones[count.index]}"
+  availability_zone       = "${var.availability_zones[count.index]}"
   tags = {
     Name                  = "${var.vpc_name}-dmz-${var.availability_zones[count.index]}"
   }
@@ -42,7 +42,7 @@ resource "aws_subnet" "subnet_core" {
   count                   = var.subnets_per_az
   vpc_id                  = aws_vpc.vpc.id
   cidr_block              = "10.${local.second_octet}.${count.index+8}.0/24"
-  availability_zone       = "${var.vpc_region}${var.availability_zones[count.index]}"
+  availability_zone       = "${var.availability_zones[count.index]}"
   map_public_ip_on_launch = false
   tags = {
     Name                  = "${var.vpc_name}-core-${var.availability_zones[count.index]}"
@@ -54,7 +54,7 @@ resource "aws_subnet" "subnet_db" {
   count                   = var.subnets_per_az
   vpc_id                  = aws_vpc.vpc.id
   cidr_block              = "10.${local.second_octet}.${count.index+16}.0/24"
-  availability_zone       = "${var.vpc_region}${var.availability_zones[count.index]}"
+  availability_zone       = "${var.availability_zones[count.index]}"
   tags = {
     Name                  = "${var.vpc_name}-db-${var.availability_zones[count.index]}"
   }

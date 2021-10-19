@@ -24,9 +24,9 @@ output "route_tables_list" {
 output "core_subnets_list" {
   value = tolist ( [for s in aws_subnet.subnet_core : s.id] )
 }
-output "db_subnet_list" {
+output "db_subnets_list" {
   value = tolist ( [for s in aws_subnet.subnet_db : s.id] )
 }
-output "dmz_subnet" {
+output "dmz_subnets_list" {
   value = tolist ( [for s in aws_subnet.subnet_dmz : s.id] )
 }

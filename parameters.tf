@@ -40,12 +40,8 @@ variable "vpc_cidr" {
   default     = "10.24.0.0/16"
 }
 
+# How many subnet per AZ to create
 variable "subnets_per_az" { default = 2 }
-
-variable "availability_zones" {
-  type    = list(any)
-  default = ["a", "b", "c"]
-}
 
 variable "key_name" { default = "drpreag_2021" }
 
@@ -54,7 +50,12 @@ variable "bastion_instance_type" { default = "t3a.micro" }
 variable "lb_instance_type" { default = "t3a.micro" }
 variable "core_instance_type" { default = "t3a.micro" }
 
+# Core autoscaling group
+variable "desired_capacity" { default = 1 }
+variable "max_size" { default = 1 }
+variable "min_size" { default = 1 }
 
 locals {
-  second_octet = split(".", var.vpc_cidr)[1]
+  second_octet       = split(".", var.vpc_cidr)[1]
+  availability_zones = ["${var.aws_region}a", "${var.aws_region}b", "${var.aws_region}c"]
 }

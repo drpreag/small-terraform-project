@@ -1,19 +1,9 @@
 # Local private zone
 
-resource "aws_route53_zone" "local" {
+resource "aws_route53_zone" "private" {
   name    = "local"
-  comment = "PRIVATE zone for ${var.vpc.tags["Name"]}"
+  comment = "PRIVATE zone for ${local.vpc_name}"
   vpc {
     vpc_id = var.vpc.id
   }
-}
-
-# Records
-
-resource "aws_route53_record" "local_any_local" {
-  zone_id = aws_route53_zone.local.id
-  name    = "local.any.local"
-  type    = "A"
-  ttl     = "300"
-  records = ["127.0.0.1"]
 }
