@@ -49,6 +49,7 @@ variable "key_name" { default = "drpreag_2021" }
 variable "bastion_instance_type" { default = "t3a.micro" }
 variable "lb_instance_type" { default = "t3a.micro" }
 variable "core_instance_type" { default = "t3a.micro" }
+variable "rds_instance_type" { default = "db.t3.micro" }
 
 # Core autoscaling group
 variable "desired_capacity" { default = 1 }

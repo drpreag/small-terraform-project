@@ -11,8 +11,8 @@ resource "aws_autoscaling_group" "core" {
   force_delete              = false
   termination_policies      = ["OldestInstance"]
   launch_template {
-    id          = aws_launch_template.core.id
-    version     = "$Latest"
+    id                      = aws_launch_template.core.id
+    version                 = "$Latest"
   }
   lifecycle {
     create_before_destroy = true
@@ -34,10 +34,11 @@ resource "aws_autoscaling_group" "core" {
     role_arn                = module.autoscale_dns.agent_lifecycle_iam_role_arn
   }
   tag {
-      key                     = "asg:hostname_pattern"
-      value                   = "${local.vpc_name}-core-#instanceid.local@${data.aws_route53_zone.private.id}"
-      propagate_at_launch     = true
+      key                   = "asg:hostname_pattern"
+      value                 = "${local.vpc_name}-core-#instanceid.local@${data.aws_route53_zone.private.id}"
+      propagate_at_launch   = true
   }
+  depends_on                = [ module.autoscale_dns ]
 }
 
 resource "aws_launch_template" "core" {

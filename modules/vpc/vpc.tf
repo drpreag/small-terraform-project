@@ -55,6 +55,7 @@ resource "aws_subnet" "subnet_db" {
   vpc_id                  = aws_vpc.vpc.id
   cidr_block              = "10.${local.second_octet}.${count.index+16}.0/24"
   availability_zone       = "${var.availability_zones[count.index]}"
+  map_public_ip_on_launch = false
   tags = {
     Name                  = "${var.vpc_name}-db-${var.availability_zones[count.index]}"
   }

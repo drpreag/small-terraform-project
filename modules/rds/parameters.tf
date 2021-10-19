@@ -1,5 +1,11 @@
+variable "vpc" {}
 
-variable "db_subnet_list" {}
-variable "vpc_name" {}
-variable "vpc_sec_groups" {}
-variable "main_tags" {}
+variable "db_sec_group" {}
+
+variable "db_subnets_list" {}
+
+variable "rds_instance_type" {}
+
+locals {
+    vpc_name  = var.vpc.tags["Name"]
+}

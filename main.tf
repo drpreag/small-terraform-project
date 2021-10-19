@@ -8,13 +8,11 @@ module "vpc" {
   availability_zones = local.availability_zones
 }
 
-
-# Security groups
+# SG
 module "sg" {
   source = "./modules/sg"
   vpc    = module.vpc.vpc
 }
-
 
 # IAM
 module "iam" {
@@ -23,13 +21,11 @@ module "iam" {
   aws_region = var.aws_region
 }
 
-
 # ROUTE 53
 module "route53" {
   source = "./modules/route53"
   vpc    = module.vpc.vpc
 }
-
 
 # EC2
 module "ec2" {
@@ -46,10 +42,18 @@ module "ec2" {
   min_size              = var.min_size
   key_name              = var.key_name
   instance_profile      = module.iam.instance_profile
-
-  depends_on = [module.route53]
+  depends_on            = [module.route53]
 }
 
+# RDS
+module "rds" {
+  source            = "./modules/rds"
+  vpc               = module.vpc.vpc
+  rds_instance_type = var.rds_instance_type
+  db_subnets_list   = module.vpc.db_subnets_list
+  db_sec_group      = module.sg.db_sec_group
+  depends_on        = [module.route53, module.kms]
+}
 
 # KMS
 module "kms" {

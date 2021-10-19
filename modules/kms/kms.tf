@@ -1,4 +1,3 @@
-
 resource "aws_kms_key" "main_key" {
   description             = "${local.vpc_name}"
   deletion_window_in_days = 7
@@ -18,8 +17,8 @@ resource "aws_kms_key" "main_key" {
 }
 
 resource "aws_kms_alias" "alias" {
-  name          = "alias/${local.vpc_name}"
-  target_key_id = aws_kms_key.main_key.id
+  name                  = "alias/${local.vpc_name}"
+  target_key_id         = aws_kms_key.main_key.id
 }
 
 data "aws_caller_identity" "current" {}
