@@ -30,3 +30,7 @@ output "db_subnets_list" {
 output "dmz_subnets_list" {
   value = tolist ( [for s in aws_subnet.subnet_dmz : s.id] )
 }
+
+output "bastion_eni" {
+  value = aws_network_interface.bastion_eni
+}

@@ -56,6 +56,14 @@ variable "desired_capacity" { default = 1 }
 variable "max_size" { default = 1 }
 variable "min_size" { default = 1 }
 
+# for whitelisting IPs on SG for SSH on bastion host
+variable "company_ips" {
+  type = map(any)
+  default = {
+    "Predrag home" = "46.235.100.0/24"
+  }
+}
+
 locals {
   second_octet       = split(".", var.vpc_cidr)[1]
   availability_zones = ["${var.aws_region}a", "${var.aws_region}b", "${var.aws_region}c"]
