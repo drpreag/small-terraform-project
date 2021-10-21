@@ -15,22 +15,6 @@
 # Author Predrag Vlajkovic 2021
 #
 
-provider "aws" {
-  region  = var.aws_region
-  profile = "default"
-  default_tags {
-    tags = {
-      Environment = "Dev"
-      Owner       = "DrPreAG"
-      Creator     = "infrastructure/terraform"
-      Project     = "small-terraform-project"
-      Vpc         = "${var.vpc_name}"
-    }
-  }
-}
-
-# Variables
-
 variable "vpc_name" { default = "stfp" }
 
 variable "aws_region" { default = "eu-west-1" }
@@ -55,6 +39,14 @@ variable "rds_instance_type" { default = "db.t3.micro" }
 variable "desired_capacity" { default = 1 }
 variable "max_size" { default = 1 }
 variable "min_size" { default = 1 }
+
+# for whitelisting IPs on SG for SSH on bastion host
+variable "company_ips" {
+  type = map(any)
+  default = {
+    "Predrag home" = "46.235.100.0/24"
+  }
+}
 
 locals {
   second_octet       = split(".", var.vpc_cidr)[1]

@@ -61,25 +61,15 @@ resource "aws_subnet" "subnet_db" {
   }
 }
 
-
-# NGW
-
-resource "aws_nat_gateway" "ngw-core" {
-  connectivity_type       = "private"
-  subnet_id               = aws_subnet.subnet_core[0].id
-  tags = {
-    Name                  = "${var.vpc_name}-ngw-core"
+# Primary ENI for bastion/nat instance
+resource "aws_network_interface" "bastion_eni" {
+  # deploy it in first AZ, dmz subnet
+  subnet_id           = aws_subnet.subnet_dmz[0].id
+  source_dest_check   = false
+  provisioner "local-exec" {
+    command           = "echo \"Bastion ENI interface ${self.id}\""
   }
 }
-
-resource "aws_nat_gateway" "ngw-db" {
-  connectivity_type       = "private"
-  subnet_id               = aws_subnet.subnet_db[0].id
-  tags = {
-    Name                  = "${var.vpc_name}-ngw-db"
-  }
-}
-
 
 # ROUTE TABLES
 
@@ -96,6 +86,10 @@ resource "aws_route_table" "dmz" {
 
 resource "aws_route_table" "core" {
   vpc_id                  = aws_vpc.vpc.id
+  route {
+    cidr_block            = "0.0.0.0/0"
+    network_interface_id  = aws_network_interface.bastion_eni.id
+  }
   tags = {
     Name                  = "${var.vpc_name}-core"
   }
@@ -103,6 +97,10 @@ resource "aws_route_table" "core" {
 
 resource "aws_route_table" "db" {
   vpc_id                  = aws_vpc.vpc.id
+  # route {
+  #   cidr_block            = var.vpc_cidr
+  #   network_interface_id  = aws_network_interface.bastion_eni.id
+  # }
   tags = {
     Name                  = "${var.vpc_name}-db"
   }
@@ -163,7 +161,7 @@ resource "aws_network_acl" "core" {
     protocol        = "-1"
     rule_no         = 100
     action          = "allow"
-    cidr_block      = var.vpc_cidr
+    cidr_block      = "0.0.0.0/0"
     from_port       = 0
     to_port         = 0
   }

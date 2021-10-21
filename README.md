@@ -11,9 +11,10 @@ This terraform repository creates:
         NACLs
         security groups
     - Instance IAM role/profile
-    - Bastion EC2 instance with EIP
-    - Core instances within ASG in private subnet
-    - R53 .local zone, with bastion instance record, and dynamic records for core ASG
+    - R53 .local private zone
+    - Bastion / NAT EC2 instance with EIP (much cheaper then have Nat gateway)
+    - Core instances within ASG in private subnet, dynamic R53 records
     - KMS key
+    - RDS mysql
 
 Note: all parameter changes should go to file: /parameters.tf .
