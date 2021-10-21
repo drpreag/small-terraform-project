@@ -15,22 +15,6 @@
 # Author Predrag Vlajkovic 2021
 #
 
-provider "aws" {
-  region  = var.aws_region
-  profile = "default"
-  default_tags {
-    tags = {
-      Environment = "Dev"
-      Owner       = "DrPreAG"
-      Creator     = "infrastructure/terraform"
-      Project     = "small-terraform-project"
-      Vpc         = "${var.vpc_name}"
-    }
-  }
-}
-
-# Variables
-
 variable "vpc_name" { default = "stfp" }
 
 variable "aws_region" { default = "eu-west-1" }

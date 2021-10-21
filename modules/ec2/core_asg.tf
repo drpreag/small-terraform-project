@@ -74,5 +74,5 @@ module "autoscale_dns" {
   version                     = "2.1.3"
   autoscale_route53zone_arn   = data.aws_route53_zone.private.id
   vpc_name                    = local.vpc_name
-  autoscale_handler_unique_identifier = "core"
+  autoscale_handler_unique_identifier = "core-asg"
 }
