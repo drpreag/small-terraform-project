@@ -11,8 +11,8 @@ resource "aws_autoscaling_group" "core" {
   force_delete              = false
   termination_policies      = ["OldestInstance"]
   launch_template {
-    id                      = aws_launch_template.core.id
-    version                 = "$Latest"
+    id      = aws_launch_template.core.id
+    version = "$Latest"
   }
   lifecycle {
     create_before_destroy = true
@@ -34,27 +34,27 @@ resource "aws_autoscaling_group" "core" {
     role_arn                = module.autoscale_dns.agent_lifecycle_iam_role_arn
   }
   tag {
-      key                   = "asg:hostname_pattern"
-      value                 = "${local.vpc_name}-core-#instanceid.local@${data.aws_route53_zone.private.id}"
-      propagate_at_launch   = true
+    key                 = "asg:hostname_pattern"
+    value               = "${local.vpc_name}-core-#instanceid.local@${data.aws_route53_zone.private.id}"
+    propagate_at_launch = true
   }
-  depends_on                = [ module.autoscale_dns ]
+  depends_on = [module.autoscale_dns]
 }
 
 resource "aws_launch_template" "core" {
-  name_prefix               = "${local.vpc_name}-core-"
-  image_id                  = data.aws_ami.base_os_image.id
-  instance_type             = var.core_instance_type
+  name_prefix   = "${local.vpc_name}-core-"
+  image_id      = data.aws_ami.base_os_image.id
+  instance_type = var.core_instance_type
   iam_instance_profile {
-    name                    = var.instance_profile
+    name = var.instance_profile
   }
-  disable_api_termination   = false # on done done set to true
-  ebs_optimized             = false
+  disable_api_termination              = false # on done done set to true
+  ebs_optimized                        = false
   instance_initiated_shutdown_behavior = "terminate"
-  vpc_security_group_ids    = [ var.core_sec_group.id ]
-  key_name                  = var.key_name
+  vpc_security_group_ids               = [var.core_sec_group.id]
+  key_name                             = var.key_name
   credit_specification {
-    cpu_credits             = "standard"
+    cpu_credits = "standard"
   }
   user_data = base64encode(data.template_file.core.template)
 }
@@ -70,9 +70,9 @@ data "template_file" "core" {
 }
 
 module "autoscale_dns" {
-  source                      = "meltwater/asg-dns-handler/aws"
-  version                     = "2.1.3"
-  autoscale_route53zone_arn   = data.aws_route53_zone.private.id
-  vpc_name                    = local.vpc_name
+  source                              = "meltwater/asg-dns-handler/aws"
+  version                             = "2.1.3"
+  autoscale_route53zone_arn           = data.aws_route53_zone.private.id
+  vpc_name                            = local.vpc_name
   autoscale_handler_unique_identifier = "core-asg"
 }

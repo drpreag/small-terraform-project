@@ -7,6 +7,6 @@ variable "subnets_per_az" { default = 1 } # for core subnet subnet only, dmz and
 variable "availability_zones" {}
 
 locals {
-  second_octet      = split(".", var.vpc_cidr)[1]
+  second_octet = split(".", var.vpc_cidr)[1]
 }
 

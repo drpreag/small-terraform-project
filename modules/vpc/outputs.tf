@@ -2,7 +2,7 @@ output "vpc" {
   value = aws_vpc.vpc
 }
 
-output "igw"{
+output "igw" {
   value = aws_internet_gateway.igw
 }
 
@@ -18,17 +18,17 @@ output "route_table_db" {
 
 # list of route tables, who knows if it will be needed
 output "route_tables_list" {
-  value = tolist ( [ aws_route_table.dmz, aws_route_table.core, aws_route_table.db ] )
+  value = tolist([aws_route_table.dmz, aws_route_table.core, aws_route_table.db])
 }
 
 output "core_subnets_list" {
-  value = tolist ( [for s in aws_subnet.subnet_core : s.id] )
+  value = tolist([for s in aws_subnet.subnet_core : s.id])
 }
 output "db_subnets_list" {
-  value = tolist ( [for s in aws_subnet.subnet_db : s.id] )
+  value = tolist([for s in aws_subnet.subnet_db : s.id])
 }
 output "dmz_subnets_list" {
-  value = tolist ( [for s in aws_subnet.subnet_dmz : s.id] )
+  value = tolist([for s in aws_subnet.subnet_dmz : s.id])
 }
 
 output "bastion_eni" {

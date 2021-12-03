@@ -7,5 +7,5 @@ variable "db_subnets_list" {}
 variable "rds_instance_type" {}
 
 locals {
-    vpc_name  = var.vpc.tags["Name"]
+  vpc_name = var.vpc.tags["Name"]
 }

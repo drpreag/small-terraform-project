@@ -10,16 +10,16 @@ variable "core_subnets_list" {}
 variable "core_sec_group" {}
 
 variable "desired_capacity" {}
-variable "max_size"         {}
-variable "min_size"         {}
+variable "max_size" {}
+variable "min_size" {}
 variable "key_name" {}
 
 variable "instance_profile" {}
 
 locals {
 
-  image_name_filter="amzl2-base-os-v"
+  image_name_filter = "amzl2-docker-base-v"
 
-  vpc_name  = var.vpc.tags["Name"]
+  vpc_name = var.vpc.tags["Name"]
 
 }

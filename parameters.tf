@@ -36,9 +36,9 @@ variable "core_instance_type" { default = "t3a.micro" }
 variable "rds_instance_type" { default = "db.t3.micro" }
 
 # Core autoscaling group
-variable "desired_capacity" { default = 1 }
+variable "desired_capacity" { default = 0 }
 variable "max_size" { default = 1 }
-variable "min_size" { default = 1 }
+variable "min_size" { default = 0 }
 
 # for whitelisting IPs on SG for SSH on bastion host
 variable "company_ips" {
