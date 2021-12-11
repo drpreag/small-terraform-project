@@ -8,8 +8,6 @@
 #         R53 records
 #
 #         TBD:
-#         Core instance(s) for taking a load
-#         Bastion host (one instance in dmz subnet)
 #         ALB
 #
 # Author Predrag Vlajkovic 2021
@@ -21,7 +19,7 @@ variable "aws_region" { default = "eu-west-1" }
 
 variable "vpc_cidr" {
   description = "VPC CIDR range in form: 10.XXX.0.0/16"
-  default     = "10.24.0.0/16"
+  default     = "10.10.0.0/16"
 }
 
 # How many subnet per AZ to create
@@ -31,13 +29,12 @@ variable "key_name" { default = "drpreag_2021" }
 
 # Instance types
 variable "bastion_instance_type" { default = "t3a.micro" }
-variable "lb_instance_type" { default = "t3a.micro" }
 variable "core_instance_type" { default = "t3a.micro" }
 variable "rds_instance_type" { default = "db.t3.micro" }
 
 # Core autoscaling group
 variable "desired_capacity" { default = 0 }
-variable "max_size" { default = 1 }
+variable "max_size" { default = 0 }
 variable "min_size" { default = 0 }
 
 # for whitelisting IPs on SG for SSH on bastion host
