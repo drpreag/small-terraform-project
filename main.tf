@@ -46,18 +46,3 @@ module "ec2" {
   depends_on            = [module.route53]
 }
 
-# RDS
-# module "rds" {
-#   source            = "./modules/rds"
-#   vpc               = module.vpc.vpc
-#   rds_instance_type = var.rds_instance_type
-#   db_subnets_list   = module.vpc.db_subnets_list
-#   db_sec_group      = module.sg.db_sec_group
-#   depends_on        = [module.route53, module.kms]
-# }
-
-# KMS
-# module "kms" {
-#   source = "./modules/kms"
-#   vpc    = module.vpc.vpc
-# }
