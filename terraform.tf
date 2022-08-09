@@ -15,16 +15,20 @@ provider "aws" {
 }
 
 terraform {
-  required_version = ">= 0.12"
+  required_version = ">= 1.2.6"
   required_providers {
     aws = {
       source  = "hashicorp/aws"
-      version = "~> 3.62"
+      version = "~> 4.25"
+    }
+    archive = {
+      source  = "hashicorp/archive"
+      version = "2.2.0"
     }
   }
   backend "s3" {
-    bucket = "imosoft-terraform-state"
+    bucket = "imosoft-terraform-state-bucket"
     region = "eu-west-1"
-    key    = "small-terraform-project.tfstate"
+    key    = "small-terraform-project/env-dev.tfstate"
   }
 }
